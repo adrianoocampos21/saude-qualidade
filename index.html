@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title> Dashboard de Saúde</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #d9e2ef 100%);
+            font-family: 'Inter', sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 2000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1A2A3F, #2C4A6E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            background: none;
+            color: #2c6e9e;
+            font-size: 2.2rem;
+        }
+
+        .header p {
+            color: #4a627a;
+            font-weight: 500;
+            font-size: 1.05rem;
+            max-width: 650px;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #2c6e9e, #1f4b6e);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 0.5rem;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #1f5a82, #143e5a);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            margin-bottom: 30px;
+        }
+
+        .health-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.02);
+            padding: 1.6rem 1.5rem 1.9rem;
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .health-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 40px -16px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.8rem;
+            border-bottom: 2px solid rgba(80, 130, 180, 0.2);
+            padding-bottom: 0.75rem;
+        }
+
+        .card-header i {
+            font-size: 2rem;
+            color: #2c6e9e;
+            background: #eef4fc;
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: inset 0 1px 2px #fff, 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f3b4c;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            color: #2c4e6e;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+
+        .input-label span:first-child i {
+            margin-right: 6px;
+            font-size: 0.8rem;
+        }
+
+        .dual-input {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .dual-input .input-group {
+            flex: 1;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 5px;
+            -webkit-appearance: none;
+            background: #cbdbe6;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type="range"]:focus {
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #2c6e9e;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+        }
+
+        .number-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 28px;
+            border: 1px solid #cfdfef;
+            background: white;
+            font-weight: 500;
+            font-family: 'Inter', monospace;
+            text-align: center;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+
+        .number-input:focus {
+            border-color: #2c6e9e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44, 110, 158, 0.2);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 28px;
+            border: 1px solid #cfdfef;
+            background: white;
+            font-weight: 500;
+            font-family: 'Inter';
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .result-area {
+            background: #eef3fc;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin: 1.2rem 0 1rem;
+            text-align: center;
+        }
+
+        .main-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1b4f72;
+            line-height: 1.2;
+        }
+
+        .main-value small {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin-top: 10px;
+            background: #ffffffcc;
+            backdrop-filter: blur(2px);
+        }
+
+        .indicator-container {
+            margin-top: 1.2rem;
+            position: relative;
+        }
+
+        .scale-bar {
+            background: linear-gradient(90deg, #b0d4f0, #f4c3b0, #e07a5f);
+            height: 8px;
+            border-radius: 12px;
+            position: relative;
+            width: 100%;
+        }
+
+        .marker {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #1f2f3e;
+            border: 3px solid white;
+            border-radius: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: left 0.2s ease-out;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #2c5a7a;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .color-tag {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #4f6f8f;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1.2rem;
+            }
+
+            .health-card {
+                padding: 1.3rem;
+            }
+
+            .main-value {
+                font-size: 1.6rem;
+            }
+
+            .export-btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="dashboard-container">
+            <div class="header">
+                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Exportar para Excel
+                    (CSV)</button>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="health-card">
+                    <div class="card-header">
+                        <i class="fas fa-heart"></i>
+                        <h2>Frequência Cardíaca</h2>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-label"><span><i class="fas fa-sliders-h"></i> BPM</span><span
+                                id="hrValueLabel">72</span></div>
+                        <input type="range" id="hrSlider" min="30" max="200" value="72" step="1">
+                        <input type="number" id="hrNumber" class="number-input" value="72" step="1" min="30" max="200">
+                    </div>
+                    <div class="result-area">
+                        <div class="main-value"><span id="hrDisplay">72</span> <small>bpm</small></div>
+                        <div class="badge" id="hrStatusBadge">Normal (60-100)</div>
+                    </div>
+                    <div class="indicator-container">
+                        <div class="scale-bar" id="hrScaleBar"></div>
+                        <div class="marker" id="hrMarker"></div>
+                        <div class="scale-labels"><span>Bradicardia</span><span>Normal</span><span>Taquicardia</span></div>
+                    </div>
+                    <div class="color-tag" id="hrAdvice">✔️ Ritmo saudável</div>
+                </div>
+
+                <div class="health-card">
+                    <div class="card-header">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h2>Pressão Arterial</h2>
+                    </div>
+                    <div class="dual-input">
+                        <div class="input-group">
+                            <div class="input-label"><span><i class="fas fa-arrow-up"></i> Sistólica</span><span
+                                    id="sysLabelVal">115</span></div>
+                            <input type="range" id="sysSlider" min="70" max="200" value="115" step="1">
+                            <input type="number" id="sysNumber" class="number-input" value="115" step="1" min="70"
+                                max="200">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label"><span><i class="fas fa-arrow-down"></i> Diastólica</span><span
+                                    id="diaLabelVal">75</span></div>
+                            <input type="range" id="diaSlider" min="40" max="130" value="75" step="1">
+                            <input type="number" id="diaNumber" class="number-input" value="75" step="1" min="40" max="130">
+                        </div>
+                    </div>
+                    <div class="result-area">
+                        <div class="main-value"><span id="bpDisplay">115</span> / <span id="bpDiastDisplay">75</span>
+                            <small>mmHg</small>
+                        </div>
+                        <div class="badge" id="bpStatusBadge">Ótimo</div>
+                    </div>
+                    <div class="indicator-container">
+                        <div class="scale-bar"
+                            style="background: linear-gradient(90deg, #5aa9dd, #7bc8a4, #f4c3a0, #e07a5f, #b22234);"></div>
+                        <div class="marker" id="bpMarker"></div>
+                        <div class="scale-labels"><span>Ótimo</span><span>Normal</span><span>Elevado</span><span>Hipertensão
+                                1</span><span>Hipertensão 2</span></div>
+                    </div>
+                    <div class="color-tag" id="bpAdvice">✅ Valores ideais</div>
+                </div>
+
+                <div class="health-card">
+                    <div class="card-header">
+                        <i class="fas fa-calculator"></i>
+                        <h2>IMC</h2>
+                    </div>
+                    <div class="dual-input">
+                        <div class="input-group">
+                            <div class="input-label"><span><i class="fas fa-weight-hanging"></i> Peso (kg)</span><span
+                                    id="weightLabel">70</span></div>
+                            <input type="range" id="weightSlider" min="30" max="180" value="70" step="0.5">
+                            <input type="number" id="weightNumber" class="number-input" value="70" step="0.5" min="30"
+                                max="180">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label"><span><i class="fas fa-ruler"></i> Altura (cm)</span><span
+                                    id="heightLabel">170</span></div>
+                            <input type="range" id="heightSlider" min="100" max="220" value="170" step="1">
+                            <input type="number" id="heightNumber" class="number-input" value="170" step="1" min="100"
+                                max="220">
+                        </div>
+                    </div>
+                    <div class="result-area">
+                        <div class="main-value"><span id="bmiValue">24.2</span> <small>kg/m²</small></div>
+                        <div class="badge" id="bmiStatus">Peso normal</div>
+                    </div>
+                    <div class="indicator-container">
+                        <div class="scale-bar"
+                            style="background: linear-gradient(90deg, #8fc9ff, #6bc48e, #f7d44a, #e67e22, #c0392b);"></div>
+                        <div class="marker" id="bmiMarker"></div>
+                        <div class="scale-labels">
+                            <span>Abaixo</span><span>Normal</span><span>Sobrepeso</span><span>Obesidade</span>
+                        </div>
+                    </div>
+                    <div class="color-tag" id="bmiAdvice">⚖️ Mantenha-se ativo</div>
+                </div>
+
+                <div class="health-card">
+                    <div class="card-header">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        <h2>Relação Cintura/Quadril</h2>
+                    </div>
+                    <div class="dual-input">
+                        <div class="input-group">
+                            <div class="input-label"><span><i class="fas fa-female"></i> Cintura (cm)</span><span
+                                    id="waistLabel">80</span></div>
+                            <input type="range" id="waistSlider" min="50" max="150" value="80" step="1">
+                            <input type="number" id="waistNumber" class="number-input" value="80" step="1" min="50"
+                                max="150">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label"><span><i class="fas fa-male"></i> Quadril (cm)</span><span
+                                    id="hipLabel">95</span></div>
+                            <input type="range" id="hipSlider" min="60" max="180" value="95" step="1">
+                            <input type="number" id="hipNumber" class="number-input" value="95" step="1" min="60" max="180">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-label"><span><i class="fas fa-venus-mars"></i> Sexo biológico</span></div>
+                        <select id="genderSelect">
+                            <option value="female">Feminino</option>
+                            <option value="male">Masculino</option>
+                        </select>
+                    </div>
+                    <div class="result-area">
+                        <div class="main-value"><span id="whrValue">0.84</span> <small>razão</small></div>
+                        <div class="badge" id="whrStatus">Risco moderado (feminino)</div>
+                    </div>
+                    <div class="indicator-container">
+                        <div class="scale-bar" style="background: linear-gradient(90deg, #6ac46e, #f0b27a, #e67e22);"></div>
+                        <div class="marker" id="whrMarker"></div>
+                        <div class="scale-labels"><span>Baixo risco</span><span>Moderado</span><span>Alto risco</span></div>
+                    </div>
+                    <div class="color-tag" id="whrAdvice">Acompanhe para saúde cardiovascular</div>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <i class="fas fa-chart-simple"></i> Indicadores interativos • Ajuste os controles para ver as classificações
+            em tempo real
+        </footer>
+    </div>
+
+    <script>
+        const hrSlider = document.getElementById('hrSlider');
+        const hrNumber = document.getElementById('hrNumber');
+        const hrDisplay = document.getElementById('hrDisplay');
+        const hrStatusBadge = document.getElementById('hrStatusBadge');
+        const hrAdvice = document.getElementById('hrAdvice');
+        const hrMarker = document.getElementById('hrMarker');
+        const sysSlider = document.getElementById('sysSlider');
+        const sysNumber = document.getElementById('sysNumber');
+        const diaSlider = document.getElementById('diaSlider');
+        const diaNumber = document.getElementById('diaNumber');
+        const bpDisplaySys = document.getElementById('bpDisplay');
+        const bpDisplayDia = document.getElementById('bpDiastDisplay');
+        const bpStatusBadge = document.getElementById('bpStatusBadge');
+        const bpAdvice = document.getElementById('bpAdvice');
+        const bpMarker = document.getElementById('bpMarker');
+        const weightSlider = document.getElementById('weightSlider');
+        const weightNumber = document.getElementById('weightNumber');
+        const heightSlider = document.getElementById('heightSlider');
+        const heightNumber = document.getElementById('heightNumber');
+        const bmiValueSpan = document.getElementById('bmiValue');
+        const bmiStatusSpan = document.getElementById('bmiStatus');
+        const bmiAdvice = document.getElementById('bmiAdvice');
+        const bmiMarker = document.getElementById('bmiMarker');
+        const waistSlider = document.getElementById('waistSlider');
+        const waistNumber = document.getElementById('waistNumber');
+        const hipSlider = document.getElementById('hipSlider');
+        const hipNumber = document.getElementById('hipNumber');
+        const genderSelect = document.getElementById('genderSelect');
+        const whrValueSpan = document.getElementById('whrValue');
+        const whrStatusSpan = document.getElementById('whrStatus');
+        const whrAdvice = document.getElementById('whrAdvice');
+        const whrMarker = document.getElementById('whrMarker');
+        const weightLabel = document.getElementById('weightLabel');
+        const heightLabel = document.getElementById('heightLabel');
+        const waistLabel = document.getElementById('waistLabel');
+        const hipLabel = document.getElementById('hipLabel');
+        const sysLabelVal = document.getElementById('sysLabelVal');
+        const diaLabelVal = document.getElementById('diaLabelVal');
+        const hrValueLabel = document.getElementById('hrValueLabel');
+
+        function syncSliderNumber(slider, number, labelSpan = null) {
+            slider.addEventListener('input', () => {
+                number.value = slider.value;
+                if (labelSpan) labelSpan.innerText = slider.value;
+                if (slider.id === 'hrSlider') updateHeartRate();
+                else if (slider.id === 'sysSlider' || slider.id === 'diaSlider') updateBloodPressure();
+                else if (slider.id === 'weightSlider' || slider.id === 'heightSlider') updateBMI();
+                else if (slider.id === 'waistSlider' || slider.id === 'hipSlider') updateWHR();
+            });
+            number.addEventListener('input', () => {
+                let val = parseFloat(number.value);
+                if (isNaN(val)) val = slider.min;
+                val = Math.min(parseFloat(slider.max), Math.max(parseFloat(slider.min), val));
+                number.value = val;
+                slider.value = val;
+                if (labelSpan) labelSpan.innerText = val;
+                if (slider.id === 'hrSlider') updateHeartRate();
+                else if (slider.id === 'sysSlider' || slider.id === 'diaSlider') updateBloodPressure();
+                else if (slider.id === 'weightSlider' || slider.id === 'heightSlider') updateBMI();
+                else if (slider.id === 'waistSlider' || slider.id === 'hipSlider') updateWHR();
+            });
+        }
+
+        syncSliderNumber(hrSlider, hrNumber, hrValueLabel);
+        syncSliderNumber(sysSlider, sysNumber, sysLabelVal);
+        syncSliderNumber(diaSlider, diaNumber, diaLabelVal);
+        syncSliderNumber(weightSlider, weightNumber, weightLabel);
+        syncSliderNumber(heightSlider, heightNumber, heightLabel);
+        syncSliderNumber(waistSlider, waistNumber, waistLabel);
+        syncSliderNumber(hipSlider, hipNumber, hipLabel);
+
+        function updateHeartRate() {
+            let bpm = parseFloat(hrSlider.value);
+            hrDisplay.innerText = bpm;
+            let classification = '';
+            let advice = '';
+            if (bpm < 60) { classification = 'Bradicardia (<60 bpm)'; advice = 'Frequência baixa, consulte um médico se sintomático.'; }
+            else if (bpm >= 60 && bpm <= 100) { classification = 'Normal (60-100 bpm)'; advice = 'Frequência cardíaca saudável.'; }
+            else { classification = 'Taquicardia (>100 bpm)'; advice = 'Frequência elevada, avalie estresse ou atividade física.'; }
+            hrStatusBadge.innerText = classification;
+            hrAdvice.innerHTML = `<i class="fas fa-info-circle"></i> ${advice}`;
+            let percent = (bpm - 30) / (200 - 30);
+            percent = Math.min(1, Math.max(0, percent));
+            hrMarker.style.left = `calc(${percent * 100}%)`;
+        }
+
+        function updateBloodPressure() {
+            let sys = parseFloat(sysSlider.value);
+            let dia = parseFloat(diaSlider.value);
+            bpDisplaySys.innerText = sys;
+            bpDisplayDia.innerText = dia;
+            let stage = '';
+            let adviceMsg = '';
+            if (sys >= 180 || dia >= 120) { stage = 'Crise Hipertensiva'; adviceMsg = 'URGENTE: procure atendimento médico imediato!'; }
+            else if (sys >= 160 || dia >= 100) { stage = 'Hipertensão Estágio 2'; adviceMsg = 'Risco elevado, intervenção médica necessária.'; }
+            else if (sys >= 140 || dia >= 90) { stage = 'Hipertensão Estágio 1'; adviceMsg = 'Monitore e adote hábitos saudáveis.'; }
+            else if (sys >= 130 || dia >= 85) { stage = 'Pressão Elevada'; adviceMsg = 'Pré-hipertensão, cuide da alimentação.'; }
+            else if (sys >= 120 && dia < 85) { stage = 'Normal'; adviceMsg = 'Pressão dentro da normalidade.'; }
+            else { stage = 'Ótimo'; adviceMsg = 'Pressão arterial excelente!'; }
+            bpStatusBadge.innerText = stage;
+            bpAdvice.innerHTML = `<i class="fas fa-stethoscope"></i> ${adviceMsg}`;
+            let percentSys = (sys - 70) / (200 - 70);
+            percentSys = Math.min(1, Math.max(0, percentSys));
+            bpMarker.style.left = `calc(${percentSys * 100}%)`;
+        }
+
+        function updateBMI() {
+            let weight = parseFloat(weightSlider.value);
+            let heightCm = parseFloat(heightSlider.value);
+            let heightM = heightCm / 100;
+            let bmi = weight / (heightM * heightM);
+            bmi = Math.round(bmi * 10) / 10;
+            bmiValueSpan.innerText = bmi;
+            let category = '';
+            let advice = '';
+            if (bmi < 18.5) { category = 'Abaixo do peso'; advice = 'Busque orientação nutricional para ganho saudável.'; }
+            else if (bmi >= 18.5 && bmi < 25) { category = 'Peso normal'; advice = 'Excelente! Mantenha hábitos saudáveis.'; }
+            else if (bmi >= 25 && bmi < 30) { category = 'Sobrepeso'; advice = 'Atividade física e reeducação alimentar ajudam.'; }
+            else { category = 'Obesidade'; advice = 'Acompanhamento médico e mudanças no estilo de vida são importantes.'; }
+            bmiStatusSpan.innerText = category;
+            bmiAdvice.innerHTML = `<i class="fas fa-apple-alt"></i> ${advice}`;
+            let minBmi = 10, maxBmi = 45;
+            let percent = (bmi - minBmi) / (maxBmi - minBmi);
+            percent = Math.min(1, Math.max(0, percent));
+            bmiMarker.style.left = `calc(${percent * 100}%)`;
+        }
+
+        function updateWHR() {
+            let waist = parseFloat(waistSlider.value);
+            let hip = parseFloat(hipSlider.value);
+            let ratio = waist / hip;
+            ratio = Math.round(ratio * 100) / 100;
+            whrValueSpan.innerText = ratio;
+            let gender = genderSelect.value;
+            let risk = '';
+            let adviceText = '';
+            if (gender === 'female') {
+                if (ratio < 0.8) { risk = 'Baixo risco cardiovascular'; adviceText = 'Ótima relação, mantenha hábitos saudáveis.'; }
+                else if (ratio >= 0.8 && ratio <= 0.85) { risk = 'Risco moderado'; adviceText = 'Fique atenta, pratique exercícios físicos.'; }
+                else { risk = 'Alto risco cardiovascular'; adviceText = 'Reduza circunferência abdominal, consulte um profissional.'; }
+            } else {
+                if (ratio < 0.95) { risk = 'Baixo risco cardiovascular'; adviceText = 'Relação saudável, continue assim!'; }
+                else if (ratio >= 0.95 && ratio <= 1.0) { risk = 'Risco moderado'; adviceText = 'Aumente atividade física e melhore alimentação.'; }
+                else { risk = 'Alto risco cardiovascular'; adviceText = 'Risco elevado, intervenção preventiva recomendada.'; }
+            }
+            whrStatusSpan.innerText = risk;
+            whrAdvice.innerHTML = `<i class="fas fa-heartbeat"></i> ${adviceText}`;
+            let minRatio = 0.5, maxRatio = 1.2;
+            let percent = (ratio - minRatio) / (maxRatio - minRatio);
+            percent = Math.min(1, Math.max(0, percent));
+            whrMarker.style.left = `calc(${percent * 100}%)`;
+        }
+
+        function exportToExcel() {
+            const sys = parseFloat(sysSlider.value);
+            const dia = parseFloat(diaSlider.value);
+            const bpm = parseFloat(hrSlider.value);
+            const weight = parseFloat(weightSlider.value);
+            const heightCm = parseFloat(heightSlider.value);
+            const waist = parseFloat(waistSlider.value);
+            const hip = parseFloat(hipSlider.value);
+            const gender = genderSelect.value === 'female' ? 'Feminino' : 'Masculino';
+            const bmi = parseFloat(bmiValueSpan.innerText);
+            const whr = parseFloat(whrValueSpan.innerText);
+            const hrClass = hrStatusBadge.innerText;
+            const bpClass = bpStatusBadge.innerText;
+            const bmiClass = bmiStatusSpan.innerText;
+            const whrClass = whrStatusSpan.innerText;
+            const timestamp = new Date().toLocaleString('pt-BR');
+            const data = [
+                ['Métrica', 'Valor', 'Classificação / Observação'],
+                ['Frequência Cardíaca', `${bpm} bpm`, hrClass],
+                ['Pressão Arterial Sistólica', `${sys} mmHg`, ''],
+                ['Pressão Arterial Diastólica', `${dia} mmHg`, bpClass],
+                ['IMC (Índice de Massa Corporal)', `${bmi} kg/m²`, bmiClass],
+                ['Relação Cintura-Quadril', `${whr}`, whrClass],
+                ['Peso', `${weight} kg`, ''],
+                ['Altura', `${heightCm} cm`, ''],
+                ['Circunferência da Cintura', `${waist} cm`, ''],
+                ['Circunferência do Quadril', `${hip} cm`, ''],
+                ['Sexo Biológico', gender, ''],
+                ['Data/Hora da coleta', timestamp, '']
+            ];
+            let csvContent = data.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', `metricas_saude_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        window.addEventListener('resize', () => { updateHeartRate(); updateBloodPressure(); updateBMI(); updateWHR(); });
+        function initAll() {
+            updateHeartRate();
+            updateBloodPressure();
+            updateBMI();
+            updateWHR();
+            weightLabel.innerText = weightSlider.value;
+            heightLabel.innerText = heightSlider.value;
+            waistLabel.innerText = waistSlider.value;
+            hipLabel.innerText = hipSlider.value;
+            sysLabelVal.innerText = sysSlider.value;
+            diaLabelVal.innerText = diaSlider.value;
+            hrValueLabel.innerText = hrSlider.value;
+        }
+        initAll();
+        genderSelect.addEventListener('change', updateWHR);
+        sysSlider.addEventListener('input', updateBloodPressure);
+        diaSlider.addEventListener('input', updateBloodPressure);
+        sysNumber.addEventListener('change', updateBloodPressure);
+        diaNumber.addEventListener('change', updateBloodPressure);
+        weightSlider.addEventListener('input', updateBMI);
+        heightSlider.addEventListener('input', updateBMI);
+        waistSlider.addEventListener('input', updateWHR);
+        hipSlider.addEventListener('input', updateWHR);
+        hrSlider.addEventListener('input', updateHeartRate);
+        document.querySelectorAll('.number-input').forEach(inp => {
+            inp.addEventListener('change', function () {
+                if (this.id.includes('sys') || this.id.includes('dia')) updateBloodPressure();
+                if (this.id.includes('weight') || this.id.includes('height')) updateBMI();
+                if (this.id.includes('waist') || this.id.includes('hip')) updateWHR();
+                if (this.id.includes('hr')) updateHeartRate();
+            });
+        });
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+    </script>
+</body>
+
+</html>
